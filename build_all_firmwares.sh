@@ -21,6 +21,7 @@ OUT_GUIDE="which_to_choose.txt"
 [[ -f "${TXT_SLOTS}" ]]    || { echo "ERROR: brak ${TXT_SLOTS}"; exit 1; }
 
 MODE_A1_DIR="standard(A1)"
+MODE_A1_SOFT_DIR="soft_load(A1)"
 MODE_P1S_DIR="high_force_load(P1S)"
 
 SOLO_RETRACT="0.095f"
@@ -46,6 +47,7 @@ build_and_copy() {
   BMCU_DM_TWO_MICROSWITCH="${dm}" \
   BMCU_ONLINE_LED_FILAMENT_RGB="${rgb}" \
   DBMCU_P1S="${p1s}" \
+  BMCU_SOFT_LOAD="0" \
   pio run -e "${PIO_ENV}"
 
   local src=".pio/build/${PIO_ENV}/firmware.bin"
@@ -60,11 +62,17 @@ mkdir -p "${OUT_DIR}"
 
 cp -f "${TXT_MODE}" "${OUT_DIR}/${OUT_GUIDE}"
 
-for p1s in 0 1; do
-  if [[ "${p1s}" == "1" ]]; then
+#for p1s in 0 1; do
+for p1s in 0 1 2; do
+  if [[ "${p1s}" == "2" ]]; then
     mode_dir="${MODE_P1S_DIR}"
-  else
+    BMCU_SOFT_LOAD="0"
+  elif [[ "${p1s}" == "1" ]]; then
     mode_dir="${MODE_A1_DIR}"
+    BMCU_SOFT_LOAD="0"
+  else
+    mode_dir="${MODE_A1_SOFT_DIR}"
+    BMCU_SOFT_LOAD="1"
   fi
 
   mode_base="${OUT_DIR}/${mode_dir}"
@@ -72,6 +80,7 @@ for p1s in 0 1; do
   cp -f "${TXT_AUTOLOAD}" "${mode_base}/${OUT_GUIDE}"
 
   for dm in 1 0; do
+#  for dm in 1; do
     if [[ "${dm}" == "1" ]]; then
       dm_dir="AUTOLOAD"
     else
@@ -83,6 +92,7 @@ for p1s in 0 1; do
     cp -f "${TXT_RGB}" "${dm_base}/${OUT_GUIDE}"
 
     for rgb in 1 0; do
+#    for rgb in 1; do
       if [[ "${rgb}" == "1" ]]; then
         rgb_dir="FILAMENT_RGB_ON"
       else
@@ -96,6 +106,7 @@ for p1s in 0 1; do
       build_and_copy "${base}/SOLO/solo_${SOLO_RETRACT}.bin" 0 "${SOLO_RETRACT}" "${dm}" "${rgb}" "${p1s}"
 
       for slot in A B C D; do
+#      for slot in A; do
         case "${slot}" in
           A) ams_num=0 ;;
           B) ams_num=1 ;;
