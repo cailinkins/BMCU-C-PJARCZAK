@@ -1,5 +1,7 @@
 # BMCU Firmware – Calibration and Compatibility Notes
 
+**Note from @cailinkins:** This fork was created to fix an issue caused by A1 firmware version 1.08 (and presumably newer) checking the version of the firmware and throwing an error if the version reported was not an expected one.
+
 This BMCU firmware has been tested and verified with the latest Bambu Lab A1 firmware.
 
 IMPORTANT:
